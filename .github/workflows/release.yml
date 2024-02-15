@@ -1,0 +1,42 @@
+name: Create new release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_release:
+    name: Create new release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v2
+
+      - name: Read last release
+        id: get_last_release
+        run: echo ::set-output name=version::$(git describe --tags $(git rev-list --tags --max-count=1))
+
+      - name: Calculate new version
+        id: calculate_new_version
+        run: echo ::set-output name=version::$(echo "${{ steps.get_last_release.outputs.version }}" | awk -F. -v OFS=. '{$NF = $NF + 1;} 1')
+
+      - name: Get commit messages
+        id: get_commit_messages
+        run: |
+          git log --pretty=format:"- %s" $(git describe --tags $(git rev-list --tags --max-count=1))..HEAD > commit_messages.txt
+          cat commit_messages.txt
+          echo "::set-output name=commit_messages::$(cat commit_messages.txt)"
+
+      - name: Create new release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.calculate_new_version.outputs.version }}
+          release_name: v${{ steps.calculate_new_version.outputs.version }}
+          body: |
+            ${{ steps.get_commit_messages.outputs.commit_messages }}
+          draft: false
+          prerelease: false
