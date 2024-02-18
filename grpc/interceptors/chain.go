@@ -3,10 +3,10 @@ package grpc
 import (
 	"time"
 
-	"github.com/Golerplate/pkg/grpc/interceptors/logger"
-	"github.com/Golerplate/pkg/grpc/interceptors/recover"
-	"github.com/Golerplate/pkg/grpc/interceptors/timeout"
 	"github.com/bufbuild/connect-go"
+	"github.com/golerplate/pkg/grpc/interceptors/logger"
+	"github.com/golerplate/pkg/grpc/interceptors/recover"
+	"github.com/golerplate/pkg/grpc/interceptors/timeout"
 )
 
 type InterceptorsChain []connect.Interceptor

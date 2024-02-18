@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	pkgerrors "github.com/Golerplate/pkg/errors"
+	pkgerrors "github.com/golerplate/pkg/errors"
 )
 
 func TranslateError(ctx context.Context, err error) (int, interface{}) {

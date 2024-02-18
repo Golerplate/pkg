@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	pkgerrors "github.com/Golerplate/pkg/errors"
+	pkgerrors "github.com/golerplate/pkg/errors"
 )
 
 func Test_Errors(t *testing.T) {

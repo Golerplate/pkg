@@ -1,9 +1,8 @@
-module github.com/Golerplate/pkg
+module github.com/golerplate/pkg
 
 go 1.21.5
 
 require (
-	github.com/Golerplate/contracts v0.0.1
 	github.com/bufbuild/connect-go v1.10.0
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/oklog/ulid/v2 v2.1.0

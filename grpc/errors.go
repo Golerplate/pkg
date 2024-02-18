@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/Golerplate/pkg/errors"
 	connectgo "github.com/bufbuild/connect-go"
+	"github.com/golerplate/pkg/errors"
 )
 
 // TranslateFromGRPCError translates an error from a gRPC service to a errors.
