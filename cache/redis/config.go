@@ -1,4 +1,4 @@
-package cache
+package redis
 
 type Config struct {
 	Host string `env:"CACHE_HOST"`

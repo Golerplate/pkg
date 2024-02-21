@@ -1,4 +1,4 @@
-package cache
+package redis
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func GetConnection(cfg Config) redis.UniversalClient {
+func GetConnection(ctx context.Context, cfg Config) redis.UniversalClient {
 	return redis.NewUniversalClient(&redis.UniversalOptions{
 		Addrs: []string{fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)},
 		DB:    0,
