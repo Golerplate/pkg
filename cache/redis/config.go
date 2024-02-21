@@ -1,6 +1,6 @@
 package redis
 
-type Config struct {
-	Host string `env:"CACHE_HOST"`
-	Port uint16 `env:"CACHE_PORT"`
+type RedisConfig struct {
+	CacheHost string `env:"CACHE_HOST"`
+	CachePort uint16 `env:"CACHE_PORT"`
 }
