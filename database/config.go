@@ -1,6 +1,6 @@
-package pgx
+package database
 
-type PGXConfig struct {
+type DatabaseConfig struct {
 	Host     string `env:"DB_HOST"`
 	Username string `env:"DB_USER"`
 	Password string `env:"DB_PASSWORD"`
