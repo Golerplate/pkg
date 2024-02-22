@@ -2,19 +2,18 @@ package redis
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
+
+	pkgerrors "github.com/golerplate/pkg/errors"
 )
 
 func (c *cacheClient) Set(ctx context.Context, key string, value interface{}) error {
 	err := c.rdb.Set(ctx, key, value, 0).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to set key in the cache")
 		return err
@@ -26,9 +25,7 @@ func (c *cacheClient) Set(ctx context.Context, key string, value interface{}) er
 func (c *cacheClient) SetEx(ctx context.Context, key string, value interface{}, duration time.Duration) error {
 	err := c.rdb.SetEx(ctx, key, value, duration).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to set key in the cache")
 		return err
@@ -40,9 +37,7 @@ func (c *cacheClient) SetEx(ctx context.Context, key string, value interface{}, 
 func (c *cacheClient) TTL(ctx context.Context, key string) (time.Duration, error) {
 	expiresAt, err := c.rdb.TTL(ctx, key).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to ttl key in the cache")
 		return expiresAt, err
@@ -55,19 +50,13 @@ func (c *cacheClient) Get(ctx context.Context, key string) (string, error) {
 	val, err := c.rdb.Get(ctx, key).Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return "", errors.New("key does not exist in the cache")
+			return "", pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to get key from the cache")
 
 		return "", err
-	}
-
-	if val == "" {
-		return "", errors.New("key does not exist in the cache")
 	}
 
 	return val, nil
@@ -76,9 +65,7 @@ func (c *cacheClient) Get(ctx context.Context, key string) (string, error) {
 func (c *cacheClient) Del(ctx context.Context, key string) error {
 	_, err := c.rdb.Del(ctx, key).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to del key in the cache")
 		return err
@@ -94,9 +81,7 @@ func (c *cacheClient) DelAll(ctx context.Context, keys ...string) error {
 
 	_, err := c.rdb.Del(ctx, keys...).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Msg("unable to DelAll keys in the cache")
 		return err
 	}
@@ -107,9 +92,7 @@ func (c *cacheClient) DelAll(ctx context.Context, keys ...string) error {
 func (c *cacheClient) Incr(ctx context.Context, key string) error {
 	err := c.rdb.Incr(ctx, key).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to incr key in the cache")
 		return err
@@ -121,9 +104,7 @@ func (c *cacheClient) Incr(ctx context.Context, key string) error {
 func (c *cacheClient) Decr(ctx context.Context, key string) error {
 	err := c.rdb.Decr(ctx, key).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to decr key in the cache")
 		return err
@@ -149,9 +130,7 @@ func (c *cacheClient) ExpiresAt(ctx context.Context, key string, tm time.Time) e
 func (c *cacheClient) HSet(ctx context.Context, key, field string, value interface{}) error {
 	err := c.rdb.HSet(ctx, key, field, value).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Str("field", field).
 			Msg("unable to set field in the hash")
@@ -164,9 +143,7 @@ func (c *cacheClient) HSet(ctx context.Context, key, field string, value interfa
 func (c *cacheClient) HGet(ctx context.Context, key, field string) (string, error) {
 	result, err := c.rdb.HGet(ctx, key, field).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Str("field", field).
 			Msg("unable to get field from the hash")
@@ -179,9 +156,7 @@ func (c *cacheClient) HGet(ctx context.Context, key, field string) (string, erro
 func (c *cacheClient) HGetAll(ctx context.Context, key string) (map[string]string, error) {
 	result, err := c.rdb.HGetAll(ctx, key).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to get all fields from the hash")
 		return nil, err
@@ -193,9 +168,7 @@ func (c *cacheClient) HGetAll(ctx context.Context, key string) (map[string]strin
 func (c *cacheClient) HIncrBy(ctx context.Context, key, field string, incr int64) error {
 	_, err := c.rdb.HIncrBy(ctx, key, field, incr).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Str("field", field).
 			Msg("unable to increment field in hash in the cache")
@@ -208,9 +181,7 @@ func (c *cacheClient) HIncrBy(ctx context.Context, key, field string, incr int64
 func (c *cacheClient) LPush(ctx context.Context, key string, value interface{}) error {
 	err := c.rdb.LPush(ctx, key, value).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to lpush key in the cache")
 		return err
@@ -222,9 +193,7 @@ func (c *cacheClient) LPush(ctx context.Context, key string, value interface{}) 
 func (c *cacheClient) LPushAll(ctx context.Context, key string, values ...interface{}) (int64, error) {
 	val, err := c.rdb.LPush(ctx, key, values...).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to LPushAll key in the cache")
 		return 0, err
@@ -237,11 +206,10 @@ func (c *cacheClient) LTrim(ctx context.Context, key string, start, stop int64) 
 	err := c.rdb.LTrim(ctx, key, start, stop).Err()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return errors.New("key does not exist in the cache")
+			return pkgerrors.NewNotFoundError("key not found")
+
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to ltrim key in the cache")
 		return err
@@ -253,9 +221,7 @@ func (c *cacheClient) LTrim(ctx context.Context, key string, start, stop int64) 
 func (c *cacheClient) LLen(ctx context.Context, key string) (int64, error) {
 	val, err := c.rdb.LLen(ctx, key).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to llen")
 
@@ -269,11 +235,9 @@ func (c *cacheClient) LPop(ctx context.Context, key string) (string, error) {
 	val, err := c.rdb.LPop(ctx, key).Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return "", errors.New("key does not exist in the cache")
+			return "", pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to lpop key in the cache")
 		return "", err
@@ -286,11 +250,9 @@ func (c *cacheClient) RPop(ctx context.Context, key string) (string, error) {
 	val, err := c.rdb.RPop(ctx, key).Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return "", errors.New("key does not exist in the cache")
+			return "", pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to rpop key in the cache")
 		return "", err
@@ -302,9 +264,7 @@ func (c *cacheClient) RPop(ctx context.Context, key string) (string, error) {
 func (c *cacheClient) Expire(ctx context.Context, key string, duration time.Duration) error {
 	err := c.rdb.Expire(ctx, key, duration).Err()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to expire key in the cache")
 		return err
@@ -320,11 +280,9 @@ func (c *cacheClient) ZAdd(ctx context.Context, key string, value interface{}) e
 	}).Err()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return errors.New("key does not exist in the cache")
+			return pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to zadd key in the cache")
 		return err
@@ -340,11 +298,9 @@ func (c *cacheClient) ZAddWithScore(ctx context.Context, key string, score float
 	}).Err()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return errors.New("key does not exist in the cache")
+			return pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to ZAddWithScore key in the cache")
 		return err
@@ -356,9 +312,7 @@ func (c *cacheClient) ZAddWithScore(ctx context.Context, key string, score float
 func (c *cacheClient) ZRem(ctx context.Context, key string, value interface{}) (int64, error) {
 	val, err := c.rdb.ZRem(ctx, key, value).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to ZRem key in the cache")
 		return 0, err
@@ -371,11 +325,9 @@ func (c *cacheClient) ZPopMin(ctx context.Context, key string, nb int64) ([]stri
 	val, err := c.rdb.ZPopMin(ctx, key, nb).Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return nil, errors.New("key does not exist in the cache")
+			return nil, pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to zpopmin key in the cache")
 		return nil, err
@@ -393,11 +345,9 @@ func (c *cacheClient) ZCount(ctx context.Context, key string) (int64, error) {
 	val, err := c.rdb.ZCount(ctx, key, "-inf", "+inf").Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return 0, errors.New("key does not exist in the cache")
+			return 0, pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to zcount key in the cache")
 		return 0, err
@@ -410,11 +360,9 @@ func (c *cacheClient) ZRange(ctx context.Context, key string) ([]string, error) 
 	val, err := c.rdb.ZRange(ctx, key, 0, -1).Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return nil, errors.New("key does not exist in the cache")
+			return nil, pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to zrange key in the cache")
 		return nil, err
@@ -427,11 +375,9 @@ func (c *cacheClient) LRange(ctx context.Context, key string) ([]string, error) 
 	val, err := c.rdb.LRange(ctx, key, 0, -1).Result()
 	if err != nil {
 		if err.Error() == redis.Nil.Error() {
-			return nil, errors.New("key does not exist in the cache")
+			return nil, pkgerrors.NewNotFoundError("key not found")
 		}
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to lrange key in the cache")
 		return nil, err
@@ -443,9 +389,7 @@ func (c *cacheClient) LRange(ctx context.Context, key string) ([]string, error) 
 func (c *cacheClient) SAdd(ctx context.Context, key string, value interface{}) (int64, error) {
 	val, err := c.rdb.SAdd(ctx, key, value).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to sadd key in the cache")
 		return 0, err
@@ -457,9 +401,7 @@ func (c *cacheClient) SAdd(ctx context.Context, key string, value interface{}) (
 func (c *cacheClient) SAddAll(ctx context.Context, key string, values ...interface{}) (int64, error) {
 	val, err := c.rdb.SAdd(ctx, key, values...).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to saddAll key in the cache")
 		return 0, err
@@ -472,9 +414,7 @@ func (c *cacheClient) SRem(ctx context.Context, key string, value interface{}) (
 
 	val, err := c.rdb.SRem(ctx, key, value).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to SRem key in the cache")
 		return 0, err
@@ -486,9 +426,7 @@ func (c *cacheClient) SRem(ctx context.Context, key string, value interface{}) (
 func (c *cacheClient) SCard(ctx context.Context, key string) (int64, error) {
 	val, err := c.rdb.SCard(ctx, key).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to scard key in the cache")
 		return 0, err
@@ -500,9 +438,7 @@ func (c *cacheClient) SCard(ctx context.Context, key string) (int64, error) {
 func (c *cacheClient) SIsMember(ctx context.Context, key string, value interface{}) (bool, error) {
 	val, err := c.rdb.SIsMember(ctx, key, value).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to SIsMember key in the cache")
 		return false, err
@@ -514,9 +450,7 @@ func (c *cacheClient) SIsMember(ctx context.Context, key string, value interface
 func (c *cacheClient) SMembers(ctx context.Context, key string) ([]string, error) {
 	values, err := c.rdb.SMembers(ctx, key).Result()
 	if err != nil {
-		log.
-			Error().
-			Err(err).
+		log.Error().Err(err).
 			Str("key", key).
 			Msg("unable to SMembers key in the cache")
 		return nil, err
