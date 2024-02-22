@@ -11,9 +11,6 @@ type DataPrefix string
 const (
 	// user related prefixes
 	User DataPrefix = "user_"
-
-	// session related prefixes
-	Session DataPrefix = "sess_"
 )
 
 func (dp DataPrefix) String() string {
