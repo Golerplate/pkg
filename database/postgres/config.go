@@ -1,4 +1,4 @@
-package database
+package database_postgres
 
 type DatabaseConfig struct {
 	Host     string `env:"DB_HOST"`
